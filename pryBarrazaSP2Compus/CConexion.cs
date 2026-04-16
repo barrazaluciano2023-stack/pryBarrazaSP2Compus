@@ -5,6 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Data; 
 using System.Data.OleDb;
+using System.IO;
 
 namespace pryBarrazaSP2Compus
 {
@@ -39,5 +40,26 @@ namespace pryBarrazaSP2Compus
 
         }
         public string ObtenerError() { return ERROR; }
+
+        public bool Grabar(string SQL)
+        {
+            bool todoOk = false;
+            try
+            {
+                OleDbCommand comando = new OleDbCommand(SQL, CNN);
+                comando.ExecuteNonQuery(); // Ejecuta el INSERT
+                todoOk = true;
+            }
+            catch (Exception ex)
+            {
+                ERROR = ex.Message;
+            }
+            return todoOk;
+        }
+
+        public void Cerrar()
+        {
+            if (CNN.State == ConnectionState.Open) CNN.Close();
+        }
     }
 }
