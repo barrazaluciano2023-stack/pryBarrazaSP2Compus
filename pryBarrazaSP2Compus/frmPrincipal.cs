@@ -32,6 +32,7 @@ namespace pryBarrazaSP2Compus
                 string linea;
                 while ((linea = lector.ReadLine()) != null)
                 {
+                    txtInfo.AppendText(" > Cargando: " + linea + Environment.NewLine);
                     string[] campos = linea.Split(','); // O el separador que usen tus archivos
                     string sql = "";
 
