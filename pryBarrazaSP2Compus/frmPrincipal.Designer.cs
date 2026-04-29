@@ -29,8 +29,8 @@
         private void InitializeComponent()
         {
             this.groupBox1 = new System.Windows.Forms.GroupBox();
-            this.btnMigracion = new System.Windows.Forms.Button();
             this.txtInfo = new System.Windows.Forms.TextBox();
+            this.btnMigracion = new System.Windows.Forms.Button();
             this.groupBox1.SuspendLayout();
             this.SuspendLayout();
             // 
@@ -44,6 +44,16 @@
             this.groupBox1.TabStop = false;
             this.groupBox1.Text = "Informacion:";
             // 
+            // txtInfo
+            // 
+            this.txtInfo.Location = new System.Drawing.Point(37, 39);
+            this.txtInfo.Multiline = true;
+            this.txtInfo.Name = "txtInfo";
+            this.txtInfo.ReadOnly = true;
+            this.txtInfo.ScrollBars = System.Windows.Forms.ScrollBars.Vertical;
+            this.txtInfo.Size = new System.Drawing.Size(630, 157);
+            this.txtInfo.TabIndex = 0;
+            // 
             // btnMigracion
             // 
             this.btnMigracion.Location = new System.Drawing.Point(321, 74);
@@ -53,14 +63,6 @@
             this.btnMigracion.Text = "Iniciar Migración";
             this.btnMigracion.UseVisualStyleBackColor = true;
             this.btnMigracion.Click += new System.EventHandler(this.btnMigracion_Click);
-            // 
-            // txtInfo
-            // 
-            this.txtInfo.Location = new System.Drawing.Point(37, 39);
-            this.txtInfo.Multiline = true;
-            this.txtInfo.Name = "txtInfo";
-            this.txtInfo.Size = new System.Drawing.Size(630, 157);
-            this.txtInfo.TabIndex = 0;
             // 
             // frmPrincipal
             // 

@@ -11,55 +11,23 @@ namespace pryBarrazaSP2Compus
 {
     internal class CConexion
     {
-        public OleDbConnection CNN;
-        public DataSet DS;
-        private string ERROR = "";
-
-        // Constructor: inicializa los objetos en null [3]
-        public CConexion()
+        public OleDbConnection conectorBaseDatos;
+        OleDbConnection comandosBaseDatos;
+        public string estadoConexion = "sin conexion";
+        //metodos para abrir la base
+        public void ConectarBaseDatos()
         {
-            CNN = new OleDbConnection();
-            DS = new DataSet();
-        }
-        // Método "Universal": Recibe la cadena de conexión por parámetro [7]
-        public bool Conectar(string Cadena)
-        {
-            bool resultado = false;
-            CNN.ConnectionString = Cadena;
             try
             {
-                CNN.Open(); // Abre la sesión física [8]
-                DS = new DataSet(); // Crea el contenedor de tablas en memoria [7, 9]
-                resultado = true;
+                conectorBaseDatos = new OleDbConnection(@"Provider=Microsoft.ACE.OLEDB.12.0;Data Source=Distribuidora.accdb;Persist Security Info=False;");
+                conectorBaseDatos.Open();
+                estadoConexion = conectorBaseDatos.State.ToString();
             }
-            catch (Exception ex)
+            catch (Exception error)
             {
-                ERROR = ex.Message; // Captura errores de ruta o permisos [7]
+                estadoConexion = "error: " + error.Message;
+                throw;
             }
-            return resultado;
-
-        }
-        public string ObtenerError() { return ERROR; }
-
-        public bool Grabar(string SQL)
-        {
-            bool todoOk = false;
-            try
-            {
-                OleDbCommand comando = new OleDbCommand(SQL, CNN);
-                comando.ExecuteNonQuery(); // Ejecuta el INSERT
-                todoOk = true;
-            }
-            catch (Exception ex)
-            {
-                ERROR = ex.Message;
-            }
-            return todoOk;
-        }
-
-        public void Cerrar()
-        {
-            if (CNN.State == ConnectionState.Open) CNN.Close();
         }
     }
 }

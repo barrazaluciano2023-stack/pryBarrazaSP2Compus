@@ -22,72 +22,136 @@ namespace pryBarrazaSP2Compus
 
             InitializeComponent();
         }
-        // Método genérico para leer archivos y ejecutar el Grabar de tu clase
-        private int ProcesarTxt(CConexion conexion, string nombreArchivo, string tabla)
-        {
-            int contador = 0;
-            // StreamReader requiere: using System.IO;
-            using (StreamReader lector = new StreamReader(nombreArchivo))
-            {
-                string linea;
-                while ((linea = lector.ReadLine()) != null)
-                {
-                    txtInfo.AppendText(" > Cargando: " + linea + Environment.NewLine);
-                    string[] campos = linea.Split(','); // O el separador que usen tus archivos
-                    string sql = "";
 
-                    if (tabla == "Categorias")
-                    {
-                        // IdCategoria, Nombre
-                        sql = $"INSERT INTO Categorias VALUES ({campos[0]}, '{campos[1]}')";
-                    }
-                    else
-                    {
-                        // IdArticulo, Nombre, IdCategoria, Precio
-                        sql = $"INSERT INTO Articulos VALUES ({campos[0]}, '{campos[1]}', {campos[2]}, {campos[3]})";
-                    }
-
-                    if (conexion.Grabar(sql)) contador++;
-                }
-            }
-            return contador;
-        }
-
-        private void btnMigracion_Click(object sender, EventArgs e)
-        {
-            CConexion objBD = new CConexion();
-            // Ajusta la ruta a donde tengas tu archivo .mdb
-            string cadena = "Provider=Microsoft.ACE.OLEDB.12.0;Data Source=" + Application.StartupPath + "\\Distribuidora.accdb";
-
-            OpenFileDialog selector = new OpenFileDialog();
-            selector.Filter = "Bases de Datos Access (*.accdb; *.mdb)|*.accdb;*.mdb";
-            txtInfo.Clear();
-
-            if (objBD.Conectar(cadena))
-            {
-                // --- PROCESAR CATEGORÍAS ---
-                txtInfo.AppendText("Migrando datos de Categorias...\r\n");
-                int filasCat = ProcesarTxt(objBD, "Categorias.txt", "Categorias");
-                txtInfo.AppendText($"Se incorporaron: {filasCat} registros nuevos.\r\n\r\n");
-
-                // --- PROCESAR ARTÍCULOS ---
-                txtInfo.AppendText("Migrando datos de Articulos...\r\n");
-                int filasArt = ProcesarTxt(objBD, "Articulos.txt", "Articulos");
-                txtInfo.AppendText($"Se incorporaron: {filasArt} registros nuevos.\r\n\r\n");
-
-                txtInfo.AppendText("Migración finalizada.");
-                objBD.Cerrar();
-            }
-            else
-            {
-                MessageBox.Show("Error de conexión: " + objBD.ObtenerError());
-            }
-
-        }
-
+        CConexion objetoConeccionBaseDatos = new CConexion();
+        
         private void frmPrincipal_Load(object sender, EventArgs e)
         {
 
+        }
+
+
+        private void btnMigracion_Click(object sender, EventArgs e)
+        {
+            txtInfo.Clear();
+
+            EscribirLog("🔌 Estado conexión: " + objetoConeccionBaseDatos.estadoConexion);
+
+          
+            LimpiarTablas();
+            CargarCategorias();
+            CargarArticulos();
+        }
+
+        public void CargarCategorias()
+        {
+            string ruta = "Categorias.txt";
+            objetoConeccionBaseDatos.ConectarBaseDatos();
+            try
+            {
+                EscribirLog("📂 Leyendo Categorias...");
+
+                using (StreamReader sr = new StreamReader(ruta))
+                {
+                    string linea = sr.ReadToEnd();
+                    string[] categorias = linea.Split(',');
+
+                    foreach (string categoria in categorias)
+                    {
+                        try
+                        {
+                            string query = "INSERT INTO Categorias (Nombre) VALUES (?)";
+
+                            using (OleDbCommand cmd = new OleDbCommand(query, objetoConeccionBaseDatos.conectorBaseDatos))
+                            {
+                                cmd.Parameters.AddWithValue("@Nombre", categoria.Trim());
+                                cmd.ExecuteNonQuery();
+                            }
+
+                            EscribirLog($"✔ Categoria insertada: {categoria}");
+                        }
+                        catch (Exception ex)
+                        {
+                            EscribirLog($"❌ Error insertando categoria '{categoria}': {ex.Message}");
+                        }
+                    }
+                }
+
+                EscribirLog("✅ Carga de categorias finalizada");
+            }
+            catch (Exception ex)
+            {
+                EscribirLog("❌ Error general: " + ex.Message);
+            }
+        }
+        public void CargarArticulos()
+        {
+            string ruta = "Articulos.txt";
+            objetoConeccionBaseDatos.ConectarBaseDatos();
+            try
+            {
+                EscribirLog("📂 Leyendo Articulos...");
+
+                using (StreamReader sr = new StreamReader(ruta))
+                {
+                    string linea;
+
+                    while ((linea = sr.ReadLine()) != null)
+                    {
+                        try
+                        {
+                            string[] datos = linea.Split(',');
+
+                            if (datos.Length != 4)
+                            {
+                                EscribirLog($"⚠ Línea inválida: {linea}");
+                                continue;
+                            }
+
+                            int idArticulo = int.Parse(datos[0]);
+                            string Nombre = datos[1];
+                            int idCategoria = int.Parse(datos[2]);
+                            double precio = double.Parse(datos[3]);
+
+                            string query = "INSERT INTO Articulos (idArticulo, Nombre, IdCategoria, Precio) VALUES (?, ?, ?, ?)";
+
+                            using (OleDbCommand cmd = new OleDbCommand(query, objetoConeccionBaseDatos.conectorBaseDatos))
+                            {
+                                cmd.Parameters.AddWithValue("@idArticulo", idArticulo);
+                                cmd.Parameters.AddWithValue("@Nombre", Nombre);
+                                cmd.Parameters.AddWithValue("@IdCategoria", idCategoria);
+                                cmd.Parameters.AddWithValue("@Precio", precio);
+
+                                cmd.ExecuteNonQuery();
+                            }
+
+                            EscribirLog($"✔ Artículo insertado: {Nombre}");
+                        }
+                        catch (Exception ex)
+                        {
+                            EscribirLog($"❌ Error en línea '{linea}': {ex.Message}");
+                        }
+                    }
+                }
+
+                EscribirLog("✅ Carga de artículos finalizada");
+            }
+            catch (Exception ex)
+            {
+                EscribirLog("❌ Error general: " + ex.Message);
+            }
+        }
+
+        private void EscribirLog(string mensaje)
+        {
+            txtInfo.AppendText(mensaje + Environment.NewLine);
+        }
+        public void LimpiarTablas()
+        {
+            objetoConeccionBaseDatos.ConectarBaseDatos();
+            OleDbCommand cmd = new OleDbCommand("DELETE FROM Categorias", objetoConeccionBaseDatos.conectorBaseDatos);
+            OleDbCommand cmd2 = new OleDbCommand("DELETE FROM Articulos", objetoConeccionBaseDatos.conectorBaseDatos);
+            cmd.ExecuteNonQuery();
         }
     }
 }
