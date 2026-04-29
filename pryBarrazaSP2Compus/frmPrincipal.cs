@@ -38,7 +38,7 @@ namespace pryBarrazaSP2Compus
             EscribirLog("🔌 Estado conexión: " + objetoConeccionBaseDatos.estadoConexion);
 
           
-            LimpiarTablas();
+           // LimpiarTablas();
             CargarCategorias();
             CargarArticulos();
         }
