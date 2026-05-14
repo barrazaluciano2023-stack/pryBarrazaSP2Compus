@@ -27,7 +27,7 @@ namespace pryBarrazaSP2Compus
         
         private void frmPrincipal_Load(object sender, EventArgs e)
         {
-
+            
         }
 
 
@@ -45,7 +45,7 @@ namespace pryBarrazaSP2Compus
 
         public void CargarCategorias()
         {
-            string ruta = "Categorias.txt";
+            string ruta = "..\\..\\DATABASE\\Categorias.txt";
             objetoConeccionBaseDatos.ConectarBaseDatos();
             try
             {
@@ -86,7 +86,7 @@ namespace pryBarrazaSP2Compus
         }
         public void CargarArticulos()
         {
-            string ruta = "Articulos.txt";
+            string ruta = "..\\..\\DATABASE\\Articulos.txt";
             objetoConeccionBaseDatos.ConectarBaseDatos();
             try
             {

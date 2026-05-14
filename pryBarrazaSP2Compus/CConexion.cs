@@ -19,7 +19,7 @@ namespace pryBarrazaSP2Compus
         {
             try
             {
-                conectorBaseDatos = new OleDbConnection(@"Provider=Microsoft.ACE.OLEDB.12.0;Data Source=Distribuidora.accdb;Persist Security Info=False;");
+                conectorBaseDatos = new OleDbConnection(@"Provider=Microsoft.ACE.OLEDB.12.0;Data Source=..\..\DATABASE\Distribuidora.accdb;Persist Security Info=False;");
                 conectorBaseDatos.Open();
                 estadoConexion = conectorBaseDatos.State.ToString();
             }
